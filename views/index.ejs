@@ -16,7 +16,7 @@
       <div class="container-fluid" ng-controller="SearchController">
         <h3>Search fo shit</h3>
         <div class="form-inline">
-          <input id="groupinput" class="form-control" type="text" name="group">
+          <input id="input" class="form-control" type="text" name="term" ng-model='term'>
           <br />
           <button class="btn btn-primary" ng-click="search()">Search</button>
         </div>
@@ -24,25 +24,25 @@
 
       <br>
 
-      <div class="container-fluid">
-        <h5>Did you mean?</h5>
-        <table class="table table-bordered table-striped">
-          <tr ng-repeat="x in suggestions">
-            <td>{{ x.text }}</td>
-          </tr>
-        </table>
-      </div>
+      <!--<div class="container-fluid">-->
+        <!--<h5>Did you mean?</h5>-->
+        <!--<table class="table table-bordered table-striped">-->
+          <!--<tr ng-repeat="x in suggestions">-->
+            <!--<td>{{ x.text }}</td>-->
+          <!--</tr>-->
+        <!--</table>-->
+      <!--</div>-->
 
-      <div class="container-fluid">
-        <table class="table table-bordered table-striped">
-          <tr ng-repeat="x in result">
-            <td>{{ x._source.id }}</td>
-            <td>{{ x._score }}</td>
-            <td>{{ x._source.title }}</td>
-            <td>{{ x._source }}</td>
-            <td><a href="https://search-myreviews-efkblmewvmkqu4j7dfkipsxqhy.us-west-1.es.amazonaws.com/499-books/book/{{ x._source.id }}">Full Text</a></td>
-          </tr>
-        </table>
-      </div>
+      <!--<div class="container-fluid">-->
+        <!--<table class="table table-bordered table-striped">-->
+          <!--<tr ng-repeat="x in result">-->
+            <!--<td>{{ x._source.id }}</td>-->
+            <!--<td>{{ x._score }}</td>-->
+            <!--<td>{{ x._source.title }}</td>-->
+            <!--<td>{{ x._source }}</td>-->
+            <!--<td><a href="https://search-myreviews-efkblmewvmkqu4j7dfkipsxqhy.us-west-1.es.amazonaws.com/499-books/book/{{ x._source.id }}">Full Text</a></td>-->
+          <!--</tr>-->
+        <!--</table>-->
+      <!--</div>-->
     </body>
 </html>

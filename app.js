@@ -6,6 +6,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
 var index = require('./routes/index');
+var Threads = require("cluster");
 
 var app = express();
 
@@ -40,5 +41,27 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
+
+
+app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+});
+
+
+// process.on('SIGINT', function() {
+//     console.log("Caught interrupt signal");
+//
+//     // if (i_should_exit)
+//     process.exit();
+//
+//
+//
+//
+//
+// });
+//
+
 
 module.exports = app;

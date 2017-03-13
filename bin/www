@@ -8,6 +8,14 @@ var app = require('../app');
 var debug = require('debug')('elasticsearch:server');
 var http = require('http');
 
+
+
+var Threads = require('webworker-threads');
+var elasticsearch = require('elasticsearch');
+var fs = require('fs');
+var TwitterPackage = require('twitter');
+// Twitter = null;
+
 /**
  * Get port from environment and store in Express.
  */
@@ -88,3 +96,73 @@ function onListening() {
     : 'port ' + addr.port;
   debug('Listening on ' + bind);
 }
+
+
+var elastic = new elasticsearch.Client({
+    host: 'https://search-tanners-a4-3zh6dubjbvtso54rei6mf4kffm.us-east-1.es.amazonaws.com/',
+    log: 'info'
+});
+
+elastic.ping({
+    requestTimeout: 3000
+}, function (error) {
+    if (error) {
+
+        console.log('elasticsearch cluser is not operational');
+
+    } else {
+        console.log('elasticsearch cluser is operational');
+
+        fs.readFile("/home/tanners/.twitter/auth.json", {encoding: 'utf-8'}, function (err, data) {
+            if (!err) {
+                var Twitter = new TwitterPackage(JSON.parse(data));
+
+                Twitter.stream('statuses/filter', {track: '#science'}, function (stream) {
+
+                    stream.on('data', function (tweet) {
+                        console.log("");
+                        console.log(tweet.id);
+                        console.log(tweet.created_at);
+                        console.log(tweet.user.screen_name);
+                        console.log(tweet.text);
+                        console.log("");
+
+                        elastic.create("true",{
+                            index: 'tweets',
+                            type: 'science',
+                            id: tweet.id,
+                            body: {
+                             //   timestamp: tweet.,
+                                username: tweet.user.screen_name,
+                                tweet: tweet.text
+                            }
+                        }, function (error, response) {
+                            console.log("Added item successfully." + error);
+                            console.log("Added item successfully. " + JSON.stringify(response));
+                        });
+                    });
+
+                    stream.on('error', function (error) {
+                        console.log(error);
+                    });
+                })
+            }
+            else {
+                console.log("ERROR: " + err);
+            }
+        });
+    }
+});
+
+
+
+// console.log("TEST");
+process.on('SIGINT', function() {
+    console.log("Caught interrupt signal");
+
+    // if (i_should_exit)
+    process.exit();
+    Twitter.close();
+});
+
+

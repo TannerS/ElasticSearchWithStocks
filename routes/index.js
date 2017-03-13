@@ -1,98 +1,93 @@
+/*
+ https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html
+ https://github.com/cpp-cs499-cc/lessons/blob/master/l08-elastic-search-demo/handler.js
+ https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-index_.html
+ http://techknights.org/workshops/nodejs-twitterbot/
+ https://www.npmjs.com/package/twitter
+ https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-get.html
+ https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html
+ */
+
 var express = require('express');
 var router = express.Router();
 var elasticsearch = require('elasticsearch');
-var fs = require('fs');
-var request = require("request");
 
-var url = "http://quote.cnbc.com/quote-html-webservice/quote.htm?partnerId=2&requestMethod=quick&exthrs=1&noform=1&fund=1&output=json&symbols=.IBEX|.FTMIB|.OMXS30|.STOXX|.AXJO|.SSEC|.KS11|.STI|.SETI|.FTFCNBCA|.VIX|.VXN|.VXD&callback=quoteHandler2";
-
-
-var search = new elasticsearch.Client({
-    host: 'search-tanners-nv2iphulfkualyxfwwhsijkqr4.us-east-1.es.amazonaws.com/',
+var elastic = new elasticsearch.Client({
+    host: 'https://search-tanners-a4-3zh6dubjbvtso54rei6mf4kffm.us-east-1.es.amazonaws.com/',
     log: 'info'
 });
 
-search.ping({
-    requestTimeout: 3000
-}, function (error) {
-    if (error) {
-        console.log('elasticsearch cluser is not operational');
-    } else {
-        console.log('elasticsearch cluser is operational');
-    }
-});
+// index: 'tweets',
+//     type: 'science',
 
-function searchForItem(term, callback) {
-    client.search({
-        index: '499-books',
+function search(term, callback) {
+
+    console.log("VALUE: " + term);
+
+    elastic.search({
+        index: 'tweets',
+        type: 'science',
+        // body: {
+        //     query: {
+        //         match: {
+        //             bdy: term
+        //         }
+        //     }
+        // }
         body: {
-            "query": {
-                "bool": {
-                    "must": {
-                        "match": {
-                            "keywords": term
+            query: {
+                        match: {
+                            // match the query against all of
+                            // the fields in the posts index
+                            _all: term
                         }
-                    },
-                    "filter": {
-                        "range": { "year": { "gte": 2011, "lte": 2013 }}
-                    }
-                }
             }
         }
+
+                        // body: {
+        //     "query": {
+        //         "bool": {
+        //             "must": {
+        //                 "match": {
+        //                     "keywords": term
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
     }, function (error, response) {
 
-        console.log(response);
+        console.log("DEBUG 1: " + JSON.stringify(response));
 
-        if (callback) {
+        if (callback)
+        {
             callback(response);
         }
     });
 }
 
-// var url = "http://quote.cnbc.com/quote-html-webservice/quote.htm?partnerId=2&requestMethod=quick&exthrs=1&noform=1&fund=1&output=json&symbols=.IBEX|.FTMIB|.OMXS30|.STOXX|.AXJO|.SSEC|.KS11|.STI|.SETI|.FTFCNBCA|.VIX|.VXN|.VXD&callback=quoteHandler2";
-
-function loadDataSet()
-{
-    request({
-        url: url,
-        json: true
-    }, function (error, response, body){
-        if (!error && response.statusCode === 200)
-        {
-            console.log(body);
-        }
-    });
-
-
-
-    //
-    // fs.readFile("dataset/data.json", {encoding: 'utf-8'}, function(err,data) {
-    //     if (!err) {
-    //         var items = JSON.parse(data);
-    //         for(var i = 0; i < 1000; i++) {
-    //             console.log(items[i].id);
-    //             client.create({
-    //                 index: '499-books',
-    //                 type: 'book',
-    //                 id: items[i].id,
-    //                 body: items[i]
-    //             }, function (error, response) {
-    //                 console.log("put item successfully.")
-    //             })
-    //         }
-    //     } else{
-    //         console.log(err);
-    //     }
-    // });
-}
-
-
+router.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+});
 
 
 router.get('/', function(req, res, next)
 {
-    loadDataSet();
-  res.render('index', { title: 'Welcome' });
+    res.render('index', { title: 'Welcome' });
 });
+
+router.post('/', function (req, res)
+{
+
+    console.log("VALUE:" + req.body.q);
+
+    search(req.body.q, function(result)
+    {
+        res.send(result);
+    });
+});
+
 
 module.exports = router;
