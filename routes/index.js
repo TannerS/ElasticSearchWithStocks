@@ -44,7 +44,7 @@ function search(term, callback) {
             }
         }
 
-                        // body: {
+        // body: {
         //     "query": {
         //         "bool": {
         //             "must": {
@@ -57,7 +57,6 @@ function search(term, callback) {
         // }
     }, function (error, response) {
 
-        console.log("DEBUG 1: " + JSON.stringify(response));
 
         if (callback)
         {

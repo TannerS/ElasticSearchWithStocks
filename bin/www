@@ -132,7 +132,7 @@ elastic.ping({
                             type: 'science',
                             id: tweet.id,
                             body: {
-                             //   timestamp: tweet.,
+                               timestamp: tweet.created_at,
                                 username: tweet.user.screen_name,
                                 tweet: tweet.text
                             }
